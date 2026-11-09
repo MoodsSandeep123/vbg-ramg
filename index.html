@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gramin Rozgar Guarantee Card</title>
+<style>
+:root{--bg:#f4f6f3;--ink:#17231c;--mut:#5b6b60;--line:#cfd8d1;--acc:#1f6b3a;--card:#fff}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Noto Sans","Noto Sans Telugu",system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--acc);color:#fff;gap:8px;flex-wrap:wrap}
+header h1{font-size:18px;margin:0}
+.lang button{border:1px solid #fff;background:transparent;color:#fff;padding:6px 12px;cursor:pointer;font:inherit}
+.lang button.on{background:#fff;color:var(--acc)}
+main{max-width:900px;margin:0 auto;padding:16px;display:grid;gap:16px}
+section.panel{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px}
+h2{font-size:16px;margin:0 0 10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+label{display:block;font-size:12px;color:var(--mut);margin-bottom:3px}
+input,select{width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;font:inherit;background:#fff}
+button.b{padding:9px 14px;border:0;border-radius:6px;background:var(--acc);color:#fff;font:inherit;cursor:pointer}
+button.g{background:#e6ece8;color:var(--ink)}
+button.r{background:#fbe4e2;color:#9b1c1c;padding:6px 10px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:end}
+.mem{border:1px solid var(--line);border-radius:6px;padding:10px;margin-bottom:8px}
+.mem .grid{grid-template-columns:repeat(auto-fit,minmax(110px,1fr))}
+.found{font-size:13px;padding:6px 0}
+.found a{color:var(--acc);cursor:pointer;text-decoration:underline;margin-right:10px}
+
+/* printable card */
+#sheet{background:#fff;border:2px solid #222;padding:18px;color:#000}
+#sheet .t{text-align:center;border-bottom:2px solid #222;padding-bottom:8px;margin-bottom:12px}
+#sheet .t h3{margin:0;font-size:20px}
+#sheet .num{text-align:center;font-size:18px;font-weight:700;letter-spacing:1px;margin:10px 0 14px}
+.top{display:flex;gap:14px;align-items:flex-start}
+.photo{width:110px;height:135px;border:1px solid #222;display:flex;align-items:center;justify-content:center;font-size:11px;color:#666;text-align:center;flex:none;overflow:hidden}
+.photo img{width:100%;height:100%;object-fit:cover}
+table{border-collapse:collapse;width:100%;font-size:13px}
+td,th{border:1px solid #888;padding:5px 7px;text-align:left;vertical-align:middle}
+th{background:#eef2ef}
+td.k{width:42%;font-weight:600;background:#f7f9f8}
+#sheet h4{margin:16px 0 6px;font-size:14px}
+.note{font-size:10px;color:#555;margin-top:12px;text-align:center}
+@media print{
+ body{background:#fff}header,.panel,.noprint{display:none!important}
+ main{padding:0;max-width:none}#sheet{border-width:2px}
+ @page{size:A4;margin:10mm}
+}
+</style>
+</head>
+<body>
+<header>
+ <h1 data-i="app"></h1>
+ <div class="lang"><button id="le" class="on" onclick="setLang('en')">English</button><button id="lt" onclick="setLang('te')">తెలుగు</button></div>
+</header>
+<main>
+ <section class="panel noprint">
+  <h2 data-i="find"></h2>
+  <div class="row">
+   <div style="flex:1;min-width:200px"><label data-i="jcn"></label><input id="q" placeholder="TS-32-009-018-001/100057"></div>
+   <button class="b" onclick="findCard()" data-i="findBtn"></button>
+  </div>
+  <div class="found" id="found"></div>
+ </section>
+
+ <section class="panel noprint">
+  <h2 data-i="enter"></h2>
+  <div class="grid">
+   <div><label data-i="jcn"></label><input id="jc"></div>
+   <div><label data-i="photo"></label><input id="ph" type="file" accept="image/*"></div>
+   <div><label data-i="head"></label><input id="head"></div>
+   <div><label data-i="fh"></label><input id="fh"></div>
+   <div><label data-i="addr"></label><input id="addr"></div>
+   <div><label data-i="village"></label><input id="village"></div>
+   <div><label data-i="gp"></label><input id="gp"></div>
+   <div><label data-i="block"></label><input id="block"></div>
+   <div><label data-i="district"></label><input id="district"></div>
+   <div><label data-i="state"></label><input id="state" value="Telangana"></div>
+   <div><label data-i="cat"></label><select id="cat"><option>ST</option><option>SC</option><option>OBC</option><option>General</option></select></div>
+   <div><label data-i="fid"></label><input id="fid"></div>
+   <div><label data-i="epic"></label><input id="epic"></div>
+   <div><label data-i="bpl"></label><select id="bpl"><option value="No">No</option><option value="Yes">Yes</option></select></div>
+   <div><label data-i="reg"></label><input id="reg" placeholder="3/31/2026"></div>
+  </div>
+  <h2 style="margin-top:16px" data-i="members"></h2>
+  <div id="mems"></div>
+  <div class="row">
+   <button class="b g" onclick="addMem()" data-i="addMem"></button>
+   <button class="b" onclick="save()" data-i="save"></button>
+   <button class="b" onclick="render();window.print()" data-i="print"></button>
+  </div>
+ </section>
+
+ <section id="sheet"></section>
+</main>
+
+<script>
+const T={
+en:{app:"Gramin Rozgar Guarantee Card",find:"Find saved card",jcn:"Job Card Number",findBtn:"Find card",enter:"Enter card details",photo:"Head of Household photo",head:"Head of Household",fh:"Father / Husband Name",addr:"House Number / Address",village:"Village",gp:"Panchayat",block:"Block",district:"District",state:"State",cat:"Social Category",fid:"Family ID",epic:"EPIC No.",bpl:"BPL Family",reg:"Registration Date",members:"Members of the Household Eligible for Work",addMem:"+ Add member",save:"Save card",print:"Print / Save PDF",
+ title:"GRAMIN ROZGAR GUARANTEE CARD",num:"Job Card No.",reg2:"Registered workforce members",sl:"Sl.",name:"Name",age:"Age",gender:"Gender",ekyc:"E-KYC Done",abps:"ABPS Enabled",bank:"Bank / Post Office",photoCol:"Photo",
+ mName:"Name",mAge:"Age",mG:"Gender",male:"Male",female:"Female",yes:"Yes",no:"No",del:"Remove",none:"No saved card found.",saved:"Saved.",unofficial:"Unofficial print copy. Verify details on the official portal (nrega.nic.in).",nophoto:"Photo"},
+te:{app:"గ్రామీణ రోజగార్ గ్యారంటీ కార్డు",find:"సేవ్ చేసిన కార్డు వెతకండి",jcn:"జాబ్ కార్డ్ నంబర్",findBtn:"కార్డు వెతకండి",enter:"కార్డు వివరాలు నమోదు చేయండి",photo:"కుటుంబ పెద్ద ఫోటో",head:"కుటుంబ పెద్ద",fh:"తండ్రి / భర్త పేరు",addr:"ఇంటి నంబర్ / చిరునామా",village:"గ్రామం",gp:"పంచాయతీ",block:"మండలం (బ్లాక్)",district:"జిల్లా",state:"రాష్ట్రం",cat:"సామాజిక వర్గం",fid:"కుటుంబ ఐడి",epic:"ఎపిక్ (EPIC) నంబర్",bpl:"బిపిఎల్ కుటుంబం",reg:"నమోదు తేదీ",members:"పనికి అర్హులైన కుటుంబ సభ్యులు",addMem:"+ సభ్యుడిని చేర్చండి",save:"కార్డు సేవ్ చేయండి",print:"ప్రింట్ / PDF సేవ్",
+ title:"గ్రామీణ రోజగార్ గ్యారంటీ కార్డు",num:"జాబ్ కార్డ్ నంబర్",reg2:"నమోదైన పని చేసే సభ్యులు",sl:"క్ర.సం.",name:"పేరు",age:"వయసు",gender:"లింగం",ekyc:"ఇ-కెవైసి పూర్తి",abps:"ఎబిపిఎస్ ఎనేబుల్",bank:"బ్యాంకు / పోస్టాఫీసు",photoCol:"ఫోటో",
+ mName:"పేరు",mAge:"వయసు",mG:"లింగం",male:"పురుషుడు",female:"స్త్రీ",yes:"అవును",no:"కాదు",del:"తొలగించు",none:"సేవ్ చేసిన కార్డు దొరకలేదు.",saved:"సేవ్ అయ్యింది.",unofficial:"ఇది అనధికారిక ప్రింట్ కాపీ. వివరాలను అధికారిక పోర్టల్ (nrega.nic.in) లో సరిచూసుకోండి.",nophoto:"ఫోటో"}
+};
+let L='en',mems=[],photo='';
+const F=['jc','head','fh','addr','village','gp','block','district','state','cat','fid','epic','bpl','reg'];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const t=k=>T[L][k];
+
+function setLang(l){L=l;document.documentElement.lang=l;$('le').classList.toggle('on',l=='en');$('lt').classList.toggle('on',l=='te');
+ document.querySelectorAll('[data-i]').forEach(e=>e.textContent=t(e.dataset.i));drawMems();render();}
+
+function addMem(m){mems.push(m||{name:'',age:'',g:'Male',ekyc:'Yes',abps:'Yes',bank:''});drawMems();render();}
+function delMem(i){mems.splice(i,1);drawMems();render();}
+function upd(i,k,v){mems[i][k]=v;render();}
+function sel(i,k,v,opts){return `<select onchange="upd(${i},'${k}',this.value)">`+opts.map(o=>`<option value="${o[0]}" ${o[0]==v?'selected':''}>${o[1]}</option>`).join('')+`</select>`}
+function drawMems(){
+ $('mems').innerHTML=mems.map((m,i)=>`<div class="mem"><div class="grid">
+  <div><label>${t('mName')}</label><input value="${esc(m.name)}" oninput="upd(${i},'name',this.value)"></div>
+  <div><label>${t('mAge')}</label><input type="number" value="${esc(m.age)}" oninput="upd(${i},'age',this.value)"></div>
+  <div><label>${t('mG')}</label>${sel(i,'g',m.g,[['Male',t('male')],['Female',t('female')]])}</div>
+  <div><label>${t('ekyc')}</label>${sel(i,'ekyc',m.ekyc,[['Yes',t('yes')],['No',t('no')]])}</div>
+  <div><label>${t('abps')}</label>${sel(i,'abps',m.abps,[['Yes',t('yes')],['No',t('no')]])}</div>
+  <div><label>${t('bank')}</label><input value="${esc(m.bank)}" oninput="upd(${i},'bank',this.value)"></div>
+  </div><div style="margin-top:8px"><button class="b r" onclick="delMem(${i})">${t('del')}</button></div></div>`).join('');
+}
+
+function val(id){return $(id).value}
+function render(){
+ const rows=[['head','head'],['fh','fh'],['addr','addr'],['village','village'],['gp','gp'],['block','block'],['district','district'],['state','state'],['cat','cat'],['fid','fid'],['epic','epic'],['bpl','bpl']];
+ const g=x=>x=='Male'?t('male'):x=='Female'?t('female'):x, yn=x=>x=='Yes'?t('yes'):x=='No'?t('no'):x;
+ $('sheet').innerHTML=`<div class="t"><h3>${t('title')}</h3></div>
+ <div class="num">${t('num')}: ${esc(val('jc'))}</div>
+ <div class="top"><div class="photo">${photo?`<img src="${photo}">`:t('nophoto')}</div>
+ <table>${rows.map(r=>`<tr><td class="k">${t(r[0])}</td><td>${esc(r[1]=='bpl'?yn(val('bpl')):val(r[1]))}</td></tr>`).join('')}
+ <tr><td class="k">${t('reg')}</td><td>${esc(val('reg'))}</td></tr></table></div>
+ <h4>${t('members')}</h4>
+ <table><tr><th>${t('sl')}</th><th>${t('name')}</th><th>${t('age')}</th><th>${t('gender')}</th><th>${t('ekyc')}</th><th>${t('abps')}</th><th>${t('bank')}</th></tr>
+ ${mems.map((m,i)=>`<tr><td>${i+1}</td><td>${esc(m.name)}</td><td>${esc(m.age)}</td><td>${g(m.g)}</td><td>${yn(m.ekyc)}</td><td>${yn(m.abps)}</td><td>${esc(m.bank)}</td></tr>`).join('')}</table>
+ <div class="note">${t('unofficial')}</div>`;
+}
+
+/* storage (browser only) */
+function db(){try{return JSON.parse(localStorage.getItem('cards')||'{}')}catch(e){return {}}}
+function save(){const k=val('jc').trim();if(!k)return;const d=db();const o={mems,photo};F.forEach(f=>o[f]=val(f));d[k]=o;
+ try{localStorage.setItem('cards',JSON.stringify(d));alert(t('saved'))}catch(e){alert('Storage full / blocked')}}
+function load(k){const o=db()[k];if(!o)return;F.forEach(f=>$(f).value=o[f]||'');mems=o.mems||[];photo=o.photo||'';drawMems();render();}
+function findCard(){const q=val('q').trim().toLowerCase();const d=db();
+ const hits=Object.keys(d).filter(k=>k.toLowerCase().includes(q)||(d[k].head||'').toLowerCase().includes(q));
+ $('found').innerHTML=hits.length?hits.map(k=>`<a onclick="load('${esc(k)}')">${esc(k)} - ${esc(d[k].head)}</a>`).join(''):t('none');}
+
+$('ph').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
+ r.onload=()=>{const im=new Image();im.onload=()=>{const c=document.createElement('canvas');const s=Math.min(1,300/im.width);c.width=im.width*s;c.height=im.height*s;
+  c.getContext('2d').drawImage(im,0,0,c.width,c.height);photo=c.toDataURL('image/jpeg',.8);render()};im.src=r.result};r.readAsDataURL(f)});
+document.addEventListener('input',e=>{if(F.includes(e.target.id))render()});
+
+/* sample data */
+F.forEach(f=>{});
+$('jc').value='TS-32-009-018-001/100057';$('head').value='Mood Sathish';$('fh').value='Sakram';$('addr').value='Raju Thanda';
+$('village').value='Raju Thanda';$('gp').value='RAJU THANDA';$('block').value='GARLA';$('district').value='Mahabubabad';$('fid').value='600057';$('reg').value='3/31/2026';
+mems=[{name:'Mood Sathish',age:26,g:'Male',ekyc:'Yes',abps:'Yes',bank:'India Post Payments Bank'},{name:'Mood Himabindu',age:25,g:'Female',ekyc:'Yes',abps:'Yes',bank:'India Post Payments Bank'}];
+setLang('en');
+</script>
+</body>
+</html>
